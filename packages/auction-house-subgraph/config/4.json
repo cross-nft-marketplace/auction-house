@@ -1,0 +1,10 @@
+{
+  "marketAddress": "85e946e1Bd35EC91044Dc83A5DdAB2B6A262ffA6",
+  "marketStartBlock": 7888368,
+  "mediaAddress": "7C2668BD0D3c050703CEcC956C11Bd520c26f7d4",
+  "mediaStartBlock": 7888368,
+  "network": "rinkeby",
+  "wethAddress": "51fB141f96A0098760708048AF685E79834E56d3",
+  "auctionHouseAddress": "1B47a9B71a3f580bAb9438D48D57A66828dD3Eb0",
+  "auctionHouseStartBlock": 10765400
+}
