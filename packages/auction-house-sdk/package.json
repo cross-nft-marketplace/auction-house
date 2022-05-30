@@ -1,0 +1,73 @@
+{
+  "name": "@cross-nft-marketplace/auction-house-sdk",
+  "description": "An SDK for using the cross-nft-marketplace Auction House",
+  "version": "1.0.0-alpha.0",
+  "main": "dist/src/index.js",
+  "typings": "dist/src/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "author": "cross-nft-marketplace",
+  "license": "GPL-3.0",
+  "private": false,
+  "scripts": {
+    "clean": "rimraf dist",
+    "build": "yarn clean && tsc",
+    "ci": "rimraf node_modules && yarn install --frozen-lockfile",
+    "chain": "ganache-cli --networkId 50 --accounts 20 -e 100 -l 10000000 -m 'concert load couple harbor equip island argue ramp clarify fence smart topic'",
+    "prepublishOnly": "yarn build"
+  },
+  "engines": {
+    "node": ">=10"
+  },
+  "dependencies": {
+    "@cross-nft-marketplace/auction-house": "1.0.0-alpha.2",
+    "ethers": "^5.0.19",
+    "rimraf": "^3.0.2",
+    "tiny-invariant": "^1.1.0"
+  },
+  "peerDependencies": {
+    "@ethersproject/abstract-signer": "^5.0.7",
+    "@ethersproject/address": "^5.0.5",
+    "@ethersproject/bignumber": "^5.0.5",
+    "@ethersproject/bytes": "^5.0.5",
+    "@ethersproject/contracts": "^5.0.5",
+    "@ethersproject/networks": "^5.0.5",
+    "@ethersproject/providers": "^5.0.5",
+    "@ethersproject/solidity": "^5.0.5",
+    "@ethersproject/transactions": "^5.0.5"
+  },
+  "devDependencies": {
+    "@ethersproject/abstract-signer": "^5.0.7",
+    "@ethersproject/address": "^5.0.5",
+    "@ethersproject/bignumber": "^5.0.5",
+    "@ethersproject/bytes": "^5.0.5",
+    "@ethersproject/contracts": "^5.0.5",
+    "@ethersproject/networks": "^5.0.5",
+    "@ethersproject/providers": "^5.0.5",
+    "@ethersproject/solidity": "^5.0.5",
+    "@ethersproject/transactions": "^5.0.5",
+    "ganache-cli": "^6.12.0",
+    "husky": "^4.3.6",
+    "jest": "^26.6.3",
+    "jest-serial-runner": "^1.1.0",
+    "lint-staged": "^10.5.3",
+    "prettier": "^2.2.1",
+    "ts-jest": "^26.4.4",
+    "typescript": "^4.0.5"
+  },
+  "lint-staged": {
+    "*.{ts,md}": "prettier --write"
+  },
+  "directories": {
+    "test": "tests"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cross-nft-marketplace/auction-house-sdk.git"
+  },
+  "bugs": {
+    "url": "https://github.com/cross-nft-marketplace/auction-house-sdk/issues"
+  },
+  "homepage": "https://github.com/cross-nft-marketplace/auction-house-sdk#readme"
+}
