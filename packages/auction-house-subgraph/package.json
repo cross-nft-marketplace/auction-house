@@ -2,6 +2,14 @@
   "name": "@cross-nft-marketplace/auction-house-subgraph",
   "version": "1.0.0-alpha.0",
   "author": "cross-nft-marketplace",
+  "homepage": "https://github.com/cross-nft-marketplace/auction-house",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cross-nft-marketplace/auction-house.git"
+  },
+  "bugs": {
+    "url": "https://github.com/cross-nft-marketplace/auction-house/issues"
+  },
   "license": "GPL-3.0",
   "scripts": {
     "chain": "ganache-cli --networkId 50 --accounts 20 -e 10000000000 -l 10000000 -m 'concert load couple harbor equip island argue ramp clarify fence smart topic'",
@@ -18,7 +26,7 @@
     "codegen": "graph codegen --output-dir types",
     "build": "graph build",
     "deploy": "graph deploy sporkspatula/zora-v1-subgraph --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/",
-    "deploy-hosted-service": "graph deploy --product hosted-service timaiv/zora-multi-currency-auction",
+    "deploy-hosted-service-mainnet": "graph deploy --product hosted-service cross-nft-marketplace/auction-house-mainnet",
     "deploy-local": "graph deploy sporkspatula/zora-v1-subgraph --ipfs http://localhost:5001 --node http://127.0.0.1:8020",
     "runAuction": "ts-node scripts/auctionHouse.ts"
   },
@@ -47,7 +55,7 @@
     "typescript": "^4.1.2"
   },
   "dependencies": {
-    "@zoralabs/auction-house": "1.1.0"
+    "@cross-nft-marketplace/auction-house": "1.0.0-alpha.3"
   },
   "jest": {
     "preset": "ts-jest"

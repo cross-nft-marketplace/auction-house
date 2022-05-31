@@ -3,7 +3,7 @@ import { JsonRpcProvider } from '@ethersproject/providers'
 import { Wallet } from '@ethersproject/wallet'
 import { MediaFactory } from '@zoralabs/core/dist/typechain/MediaFactory'
 import { MarketFactory } from '@zoralabs/core/dist/typechain/MarketFactory'
-import { AuctionHouse__factory, WETH__factory } from '@zoralabs/auction-house/dist/typechain'
+import { AuctionHouse__factory, WETH__factory } from '@cross-nft-marketplace/auction-house'
 
 async function start() {
   const args = require('minimist')(process.argv.slice(2))

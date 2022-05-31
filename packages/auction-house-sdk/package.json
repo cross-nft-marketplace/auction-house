@@ -1,7 +1,7 @@
 {
   "name": "@cross-nft-marketplace/auction-house-sdk",
   "description": "An SDK for using the cross-nft-marketplace Auction House",
-  "version": "1.0.0-alpha.0",
+  "version": "1.0.0-alpha.1",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
   "files": [
@@ -21,7 +21,7 @@
     "node": ">=10"
   },
   "dependencies": {
-    "@cross-nft-marketplace/auction-house": "1.0.0-alpha.2",
+    "@cross-nft-marketplace/auction-house": "1.0.0-alpha.3",
     "ethers": "^5.0.19",
     "rimraf": "^3.0.2",
     "tiny-invariant": "^1.1.0"
@@ -62,12 +62,12 @@
   "directories": {
     "test": "tests"
   },
+  "homepage": "https://github.com/cross-nft-marketplace/auction-house",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/cross-nft-marketplace/auction-house-sdk.git"
+    "url": "https://github.com/cross-nft-marketplace/auction-house.git"
   },
   "bugs": {
-    "url": "https://github.com/cross-nft-marketplace/auction-house-sdk/issues"
-  },
-  "homepage": "https://github.com/cross-nft-marketplace/auction-house-sdk#readme"
+    "url": "https://github.com/cross-nft-marketplace/auction-house/issues"
+  }
 }

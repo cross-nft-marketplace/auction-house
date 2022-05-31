@@ -278,10 +278,10 @@
     exec-sh "^0.3.2"
     minimist "^1.2.0"
 
-"@cross-nft-marketplace/auction-house@1.0.0-alpha.2":
-  version "1.0.0-alpha.2"
-  resolved "https://registry.yarnpkg.com/@cross-nft-marketplace/auction-house/-/auction-house-1.0.0-alpha.2.tgz#01f1957f25a892b90cea153436b1faa7cab920a0"
-  integrity sha512-HXkddksjTB47nIpYSlSn4yV8rAISw/cebs+C6BmB2g0kJBVTSEtdrsJj+3aPonQ+zoxnxPXJnQ22TyzqhUgwmQ==
+"@cross-nft-marketplace/auction-house@1.0.0-alpha.3":
+  version "1.0.0-alpha.3"
+  resolved "https://registry.yarnpkg.com/@cross-nft-marketplace/auction-house/-/auction-house-1.0.0-alpha.3.tgz#c8faf2aec5ea818e264330aaeae3a48fca8dc9ec"
+  integrity sha512-/CkvZlDhH6yglXl3IQLkDTghLlv9fOjw4tqaLz4ZjNTaJQYSRN7yYFDC2Oz+8+nMtFX08EHjGEz7NrrBB40cPw==
   dependencies:
     "@openzeppelin/contracts" "^4.6.0"
     "@zoralabs/core" "^1.0.7"

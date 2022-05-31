@@ -10,7 +10,7 @@ Anyone is able to run an NFT auction on the protocol for free by simply not spec
 
 The cross-nft-marketplace ethos is to create public goods that are either owned by the community or by no one. As such, we have deployed this without admin functionality, and is therefore entirely permissionless and unstoppable.
 
-*Mainnet address:* `TODO`
+*Mainnet address:* `TBD`
 
 *Rinkeby address:* `0x1B47a9B71a3f580bAb9438D48D57A66828dD3Eb0`
 
@@ -26,8 +26,6 @@ The cross-nft-marketplace ethos is to create public goods that are either owned 
   - [Install Dependencies](#install-dependencies)
   - [Compile Contracts](#compile-contracts)
   - [Run Tests](#run-tests)
-- [Bug Bounty](#bug-bounty)
-- [Acknowledgements](#acknowledgements)
 
 ## Architecture
 This protocol allows a holder of any NFT to create and perform

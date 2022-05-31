@@ -3,7 +3,7 @@ import { Wallet } from '@ethersproject/wallet'
 import { generatedWallets, privateKeys } from '@zoralabs/core/dist/utils/generatedWallets'
 import { promises as fs } from "fs"
 import { MediaFactory } from '@zoralabs/core/dist/typechain'
-import { AuctionHouse__factory } from '@zoralabs/auction-house/dist/typechain'
+import { AuctionHouse__factory } from '@cross-nft-marketplace/auction-house'
 import { BigNumber, ethers } from 'ethers'
 
 async function runAuction() {
@@ -68,13 +68,13 @@ async function runAuction() {
   await auction
     // @ts-ignore
     .connect(bidder1)
-    .createBid(media.address, 0, ONE_ETH.toString(), { value: ONE_ETH.toString() });
+    .createBid(0, ONE_ETH.toString(), { value: ONE_ETH.toString() });
 
   console.log('Creating second bid')
   await auction
     // @ts-ignore
     .connect(bidder2)
-    .createBid(media.address, 0, TWO_ETH.toString(), { value: TWO_ETH.toString() });
+    .createBid(0, TWO_ETH.toString(), { value: TWO_ETH.toString() });
 
   console.log('fast forwarding time')
   await provider.send("evm_increaseTime", [

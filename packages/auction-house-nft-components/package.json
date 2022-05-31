@@ -8,7 +8,14 @@
   "files": [
     "dist"
   ],
-  "repository": "https://github.com/cross-nft-marketplace/auction-house-nft-components",
+  "homepage": "https://github.com/cross-nft-marketplace/auction-house",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cross-nft-marketplace/auction-house.git"
+  },
+  "bugs": {
+    "url": "https://github.com/cross-nft-marketplace/auction-house/issues"
+  },
   "author": "cross-nft-marketplace",
   "license": "GPL-3.0",
   "private": false,

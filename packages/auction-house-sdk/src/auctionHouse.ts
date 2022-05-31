@@ -4,7 +4,7 @@ import { AuctionHouse__factory } from '@cross-nft-marketplace/auction-house/dist
 import rinkebyAddresses from '@cross-nft-marketplace/auction-house/dist/addresses/4.json'
 import mainnetAddresses from '@cross-nft-marketplace/auction-house/dist/addresses/1.json'
 import { chainIdToNetworkName } from './utils'
-import { AuctionHouse as AuctionHouseContract } from '@cross-nft-marketplace/auction-house/dist/typechain/typechain/AuctionHouse'
+import { AuctionHouse as AuctionHouseContract } from '@cross-nft-marketplace/auction-house'
 
 const auctionHouseAddresses: { [key: string]: string } = {
   rinkeby: rinkebyAddresses.auctionHouse,
@@ -64,7 +64,7 @@ export class AuctionHouse {
     duration: BigNumberish,
     reserveAndBuyNowCurrency: string,
     reservePrice: BigNumberish,
-    buyNowPrice: BigNumberish, //todo possible optional param or create constant BUY_NOW_OFF = 0
+    buyNowPrice: BigNumberish,
     curator: string,
     curatorFeePercentages: number,
     auctionCurrencies: string[],

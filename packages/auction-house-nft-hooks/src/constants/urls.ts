@@ -1,8 +1,8 @@
 import { Networks } from './networks';
 
 export const THEGRAPH_API_URL_BY_NETWORK = {
-  [Networks.MAINNET]: 'https://api.thegraph.com/subgraphs/name/ourzora/zora-v1',
-  [Networks.RINKEBY]: 'https://api.thegraph.com/subgraphs/name/timaiv/zora-multi-currency-auction'
+  [Networks.MAINNET]: 'https://api.thegraph.com/subgraphs/name/cross-nft-marketplace/auction-house-mainnet',
+  [Networks.RINKEBY]: 'https://api.thegraph.com/subgraphs/name/cross-nft-marketplace/auction-house-rinkeby'
 };
 
 export const ENS_GRAPH_URL_BY_NETWORK = {
