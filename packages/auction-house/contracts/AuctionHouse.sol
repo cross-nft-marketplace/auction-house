@@ -1714,6 +1714,8 @@ contract AuctionHouse is IAuctionHouse_v2, ReentrancyGuard, Initializable {
         uint256 fromAmount,
         address toCurrency
     ) public override view returns (uint256) {
+        if (fromCurrency == toCurrency) return fromAmount;
+
         uint256 fromPrice = convertToControlCurrency_v2(fromCurrency, fromAmount);
         return convertFromControlCurrency_v2(fromPrice, toCurrency);
     }
@@ -1786,8 +1788,6 @@ contract AuctionHouse is IAuctionHouse_v2, ReentrancyGuard, Initializable {
         );
         require(curatorFeePercentage < 100, "curatorFeePercentage must be less than 100");
         _ensureCurrencySupported_v2(reserveAndBuyNowCurrency);
-        address tokenOwner = IERC721(tokenContract).ownerOf(tokenId);
-        require(msg.sender == IERC721(tokenContract).getApproved(tokenId) || msg.sender == tokenOwner, "Caller must be approved or owner for token id");
         _ensureCurrenciesSupported_v2(auctionCurrencies);
         _ensureBuyNowPriceValid(reservePrice, buyNowPrice);
 
@@ -1804,32 +1804,32 @@ contract AuctionHouse is IAuctionHouse_v2, ReentrancyGuard, Initializable {
             reserveAndBuyNowCurrency: reserveAndBuyNowCurrency,
             reservePrice: reservePrice,
             curatorFeePercentage: curatorFeePercentage,
-            tokenOwner: tokenOwner,
+            tokenOwner: msg.sender,
             bidder: payable(address(0)),
             curator: curator,
             auctionCurrencies: auctionCurrencies,
             buyNowPrice: buyNowPrice
         });
 
-        IERC721(tokenContract).transferFrom(tokenOwner, address(this), tokenId);
+        IERC721(tokenContract).transferFrom(msg.sender, address(this), tokenId);
 
         _auctionIdTracker_v2.increment();
 
         emit AuctionCreated_v2(
-            auctionId, 
-            tokenId, 
-            tokenContract, 
-            duration, 
+            auctionId,
+            tokenId,
+            tokenContract,
+            duration,
             reserveAndBuyNowCurrency, 
-            reservePrice, 
+            reservePrice,
             buyNowPrice,
-            tokenOwner, 
-            curator, 
+            msg.sender,
+            curator,
             curatorFeePercentage, 
             auctionCurrencies 
-            );
+        );
 
-        if(auctions_v2[auctionId].curator == address(0) || curator == tokenOwner) {
+        if(curator == address(0) || curator == msg.sender) {
             _approveAuction_v2(auctionId, true);
         }
 
@@ -2021,7 +2021,7 @@ contract AuctionHouse is IAuctionHouse_v2, ReentrancyGuard, Initializable {
             }
         }
 
-        _handleIncomingBid(context.amountActual, currency);
+        _handleIncomingBid_v2(context.amountActual, currency);
 
         auction.currency = currency;
         auction.amount = context.amountActual;
@@ -2122,9 +2122,13 @@ contract AuctionHouse is IAuctionHouse_v2, ReentrancyGuard, Initializable {
             auction.amount
         );
 
+        if (oldBidPrice == 0) {
+            return (false, amount);
+        }
+
         uint256 minValidNewBidPrice = _addPercentage_v2(
             oldBidPrice,
-            minBidIncrementPercentage * 100 // mutiply by 100 to convert from percents to basis points
+            uint16(minBidIncrementPercentage) * 100 // mutiply by 100 to convert from percents to basis points
         );
 
         if (newBidPrice >= minValidNewBidPrice) {
@@ -2308,6 +2312,28 @@ contract AuctionHouse is IAuctionHouse_v2, ReentrancyGuard, Initializable {
         // If this is an ETH bid, ensure they sent enough and convert it to WETH under the hood
         if(currency == address(0)) {
             require(msg.value == amount, "Sent ETH Value does not match specified bid amount");
+            IWETH(wethAddress).deposit{value: amount}();
+        } else {
+            // We must check the balance that was actually transferred to the auction,
+            // as some tokens impose a transfer fee and would not actually transfer the
+            // full amount to the market, resulting in potentally locked funds
+            IERC20 token = IERC20(currency);
+            uint256 beforeBalance = token.balanceOf(address(this));
+            token.safeTransferFrom(msg.sender, address(this), amount);
+            uint256 afterBalance = token.balanceOf(address(this));
+            require(beforeBalance.add(amount) == afterBalance, "Token transfer call did not transfer expected amount");
+        }
+    }
+
+    function _handleIncomingBid_v2(uint256 amount, address currency) internal {
+        // If this is an ETH bid, ensure they sent enough and convert it to WETH under the hood
+        if(currency == address(0)) {
+            require(msg.value >= amount, "Sent insufficient ETH amount");
+
+            if (msg.value > amount) {
+                require(_safeTransferETH(msg.sender, msg.value - amount), "Excess ETH refund failed");
+            }
+
             IWETH(wethAddress).deposit{value: amount}();
         } else {
             // We must check the balance that was actually transferred to the auction,

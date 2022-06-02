@@ -57,6 +57,36 @@ export const AuctionInfo = ({
     );
   }
 
+  const reserveAuctionCommonInfo = (
+    <>
+      {data.pricing.auctionType === AuctionType.RESERVE && data.pricing.reserve && (
+        <>
+          {data.pricing.reserve.buyNowPrice && (
+            <div>
+              <div {...getStyles("fullInfoSpacer")} />
+              <div {...getStyles("fullLabel")}>
+                {getString("BUY_NOW_PRICE")}
+              </div>
+              <div {...getStyles("fullInfoAuctionPricing")}>
+                <PricingString pricing={data.pricing.reserve.buyNowPrice} />
+              </div>
+            </div>
+          )}
+          {data.pricing.reserve.auctionCurrencies && (
+            <div>
+              <div {...getStyles("fullInfoSpacer")} />
+              <div {...getStyles("fullLabel")}>
+                {getString("AVAILABLE_CURRENCIES")}
+              </div>
+              <span>{data.pricing.reserve.auctionCurrencies?.map(cur => cur.symbol).join(", ")}</span>
+            </div>
+          )}
+        </>
+      )
+      }
+    </>
+  )
+  
   const reserve = data.pricing.reserve;
 
   if (
@@ -98,6 +128,7 @@ export const AuctionInfo = ({
         <div {...getStyles("fullInfoSpacer")} />
         <div {...getStyles("fullLabel")}>{getString("BIDDER")}</div>
         <AddressView address={reserve.current.highestBid?.placedBy} />
+        {reserveAuctionCommonInfo}
       </AuctionInfoWrapper>
     );
   }
@@ -139,26 +170,7 @@ export const AuctionInfo = ({
               <div {...getStyles("fullInfoAuctionPricing")}>
                 <PricingString pricing={data.pricing.reserve.reservePrice} />
               </div>
-              {data.pricing.reserve.buyNowPrice && (
-                <div>
-                  <div {...getStyles("fullInfoSpacer")} />
-                  <div {...getStyles("fullLabel")}>
-                    {getString("BUY_NOW_PRICE")}
-                  </div>
-                  <div {...getStyles("fullInfoAuctionPricing")}>
-                    <PricingString pricing={data.pricing.reserve.buyNowPrice} />
-                  </div>
-                </div>
-              )}
-              {data.pricing.reserve.auctionCurrencies && (
-                <div>
-                  <div {...getStyles("fullInfoSpacer")} />
-                  <div {...getStyles("fullLabel")}>
-                    {getString("AVAILABLE_CURRENCIES")}
-                  </div>
-                  <span>{data.pricing.reserve.auctionCurrencies?.map(cur => cur.symbol).join(", ")}</span>
-                </div>
-              )}
+              {reserveAuctionCommonInfo}
               <div>
                 <div {...getStyles("fullInfoSpacer")} />
                 <div {...getStyles("fullLabel")}>

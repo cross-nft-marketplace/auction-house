@@ -143,4 +143,12 @@ export class AuctionHouse {
   ): Promise<BigNumber> {
     return this.auctionHouse.convertToControlCurrency_v2(currency, amount)
   }
+
+  public async convertFromControlCurrency(fromAmount: BigNumberish, toCurrency: string): Promise<BigNumber> {
+    return this.auctionHouse.convertFromControlCurrency_v2(fromAmount, toCurrency);
+  }
+
+  public async convertCurrency(fromCurrency: string, fromAmount: BigNumberish, toCurrency: string): Promise<BigNumber> {
+    return this.auctionHouse.convertCurrency_v2(fromCurrency, fromAmount, toCurrency);
+  }
 }
