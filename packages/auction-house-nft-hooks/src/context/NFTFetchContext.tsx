@@ -12,18 +12,20 @@ type NFTFetchConfigurationProps = {
   networkId: NetworkIDs;
   // TODO(iain): fix children type
   children: React.ReactNode;
+  infuraApiKey?: string;
 };
 
 export const NFTFetchConfiguration = ({
   networkId,
   children,
+  infuraApiKey,
 }: NFTFetchConfigurationProps) => {
   const lastFetchContext = useContext(NFTFetchContext);
   const fetchAgent = useMemo(() => {
     if (lastFetchContext.networkId === networkId) {
       return lastFetchContext;
     }
-    return new MediaFetchAgent(networkId);
+    return new MediaFetchAgent(networkId, infuraApiKey);
   }, [networkId]);
   return (
     <NFTFetchContext.Provider value={fetchAgent}>{children}</NFTFetchContext.Provider>

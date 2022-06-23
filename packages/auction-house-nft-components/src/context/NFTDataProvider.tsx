@@ -8,9 +8,10 @@ import {
 
 import { NFTDataContext } from "./NFTDataContext";
 import type {
-  OpenseaNFTDataType,
-  ZNFTDataType,
+  OpenseaNFTDataType
 } from "@cross-nft-marketplace/auction-house-nft-hooks/dist/fetcher/AuctionInfoTypes";
+import type { NftDataFetchStrategy } from "@cross-nft-marketplace/auction-house-nft-hooks";
+import type { IndexerDataType } from "@zoralabs/nft-hooks/dist/fetcher/AuctionInfoTypes";
 
 export type NFTDataProviderProps = {
   id: string;
@@ -24,10 +25,11 @@ export type NFTDataProviderProps = {
         metadata?: useNFTMetadataType["metadata"];
       }
     | any;
+  fetchStrategy?: NftDataFetchStrategy
 };
 
-let isZNFT = (p: any): p is ZNFTDataType => p && !!p.zoraNFT;
 let isOpensea = (p: any): p is OpenseaNFTDataType => p && !!p.openseaInfo;
+let isZoraIndexer = (p: any): p is IndexerDataType => p && !!p.zoraIndexerResponse;
 
 export const NFTDataProvider = ({
   id,
@@ -36,6 +38,7 @@ export const NFTDataProvider = ({
   refreshInterval,
   initialData,
   useZoraIndexer = false,
+  fetchStrategy
 }: NFTDataProviderProps) => {
   const { nft: nftInitial } = initialData || {};
   if (nftInitial?.tokenData && !useZoraIndexer) {
@@ -48,28 +51,27 @@ export const NFTDataProvider = ({
     loadCurrencyInfo: true,
     initialData: nftInitial,
     refreshInterval: refreshInterval,
-    useZoraIndexer
+    useZoraIndexer,
+    fetchStrategy
   });
-
+  
+  const openseaMetadata = isOpensea(nft.data)
+  ? {
+    loading: !!nft.data,
+    metadata: nft.data
+    ? DataTransformers.openseaDataToMetadata(nft.data)
+    : undefined,
+  }
+  : undefined;
+  
+  const zoraIndexerMetadata = isZoraIndexer(nft.data) && nft.data.zoraIndexerResponse.metadata?.json;
+  
+  const needLoadMetadata = !zoraIndexerMetadata && !openseaMetadata && nft.data?.nft.metadataURI;
+  
   const fetchedMetadata = useNFTMetadata(
-    isZNFT(nft.data) ? nft.data?.nft.metadataURI : undefined,
+    needLoadMetadata ? nft.data?.nft.metadataURI : undefined,
     initialData?.metadata
   );
-
-  const openseaMetadata = isOpensea(nft.data)
-    ? {
-        loading: !!nft.data,
-        metadata: nft.data
-          ? DataTransformers.openseaDataToMetadata(nft.data)
-          : undefined,
-      }
-    : undefined;
-
-  let zoraIndexerMetadata =
-    nft &&
-    nft.data &&
-    "zoraIndexerResponse" in nft.data &&//todo remove this check
-    (nft as any).data?.zoraIndexerResponse?.metadata?.json;
 
   const metadata = zoraIndexerMetadata
     ? {

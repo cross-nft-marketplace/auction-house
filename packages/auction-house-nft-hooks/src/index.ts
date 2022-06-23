@@ -1,5 +1,5 @@
 import { Networks, NetworkIDs } from './constants/networks';
-import { useNFT, useNFTType } from './hooks/useNFT';
+import { NftDataFetchStrategy, useNFT, useNFTType } from './hooks/useNFT';
 import { useZNFT, useZNFTType } from './hooks/useZNFT';
 import { useOpenseaNFT, useOpenseaNFTType } from './hooks/useOpenseaNFT';
 import { useNFTContent, useNFTContentType } from './hooks/useNFTContent';
@@ -37,6 +37,7 @@ export {
   useOpenseaNFTType,
   useZNFTType,
   // Types
+  NftDataFetchStrategy,
   PricingInfo,
   // Configuration
   NFTFetchConfiguration,

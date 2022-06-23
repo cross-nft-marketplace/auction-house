@@ -77,6 +77,9 @@ export type OpenseaNFTMediaDataType = CommonNFTMediaDataType & {
   openseaInfo: OpenseaResponse;
 };
 
+export type BlockchainNFTMediaDataType = CommonNFTMediaDataType & {
+};
+
 export type HighestBidType = {
   pricing: PricingInfo;
   placedBy: string;
@@ -112,12 +115,16 @@ export type OpenseaNFTDataType = Omit<OpenseaNFTMediaDataType, 'pricing'> & {
   pricing: PricingInfoData;
 };
 
+export type BlockchainNFTDataType = Omit<BlockchainNFTMediaDataType, 'pricing'> & {
+  pricing: PricingInfoData;
+};
+
 export type IndexerDataType = Omit<CommonNFTMediaDataType, 'pricing'> & {
   zoraIndexerResponse: IndexerTokenWithAuctionFragment;//todo remove me
   zoraNFT?: ZoraNFTType,//todo remove me
   pricing: PricingInfoData;
 };
 
-export type NFTDataType = ZNFTDataType | OpenseaNFTDataType | IndexerDataType;//todo remove zoraIndexerResponse
+export type NFTDataType = ZNFTDataType | OpenseaNFTDataType | IndexerDataType | BlockchainNFTDataType;//todo remove zoraIndexerResponse
 
 export type CurrencyLookupType = { [currencyId: string]: ChainCurrencyType };

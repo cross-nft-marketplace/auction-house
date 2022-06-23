@@ -1,3 +1,4 @@
+import { DEFAULT_FETCH_STRATEGY, NftDataFetchStrategy } from '../hooks/useNFT';
 import { ZORA_MEDIA_CONTRACT_BY_NETWORK } from '../constants/addresses';
 import { NFTDataType } from './AuctionInfoTypes';
 import { FetchGroupTypes } from './FetchResultTypes';
@@ -5,6 +6,8 @@ import { MediaFetchAgent } from './MediaFetchAgent';
 import { MetadataIsh } from './MetadataTypes';
 import { openseaDataToMetadata } from './OpenseaUtils';
 import { addAuctionInformation } from './TransformFetchResults';
+import { transformNFTIndexerResponse } from './ZoraIndexerTransformers';
+import { transformBlockchainResponse } from './BlockchainUtils';
 
 /**
  * This removes undefined values to sanitize
@@ -23,7 +26,26 @@ type fetchNFTDataType = {
   contractAddress?: string;
   fetchAgent: MediaFetchAgent;
   prepareDataJSON?: boolean;
+  fetchStrategy?: NftDataFetchStrategy
 };
+
+//https://stackoverflow.com/a/37235274
+function oneSuccess(promises: Promise<any>[]) {
+  return Promise.all(promises.map(p => {
+    // If a request fails, count that as a resolution so it will keep
+    // waiting for other possible successes. If a request succeeds,
+    // treat it as a rejection so Promise.all immediately bails out.
+    return p.then(
+      val => Promise.reject(val),
+      err => Promise.resolve(err)
+    );
+  })).then(
+    // If '.all' resolved, we've just got an array of errors.
+    errors => Promise.reject(errors),
+    // If '.all' rejected, we've got the result we wanted.
+    val => Promise.resolve(val)
+  );
+}
 
 /**
  * Async function to fetch auction information and metadata for any
@@ -45,34 +67,69 @@ export const fetchNFTData: (args: fetchNFTDataType) => Promise<{
   contractAddress,
   fetchAgent,
   prepareDataJSON = true,
+  fetchStrategy = DEFAULT_FETCH_STRATEGY,
 }: fetchNFTDataType) => {
-  if (
-    contractAddress &&
-    contractAddress !== ZORA_MEDIA_CONTRACT_BY_NETWORK[fetchAgent.networkId]
-  ) {
-    const auctionData = await fetchAgent.loadAuctionInfo(contractAddress, tokenId);
-    const nft = await fetchAgent.loadNFTData(contractAddress, tokenId, auctionData);
-    const metadata = openseaDataToMetadata(nft);
-    const response = {
-      nft,
-      metadata,
-    };
-    if (prepareDataJSON) {
-      return prepareJson(response);
-    }
-    return response;
-  } else {
-    const nft = await fetchAgent.loadZNFTData(tokenId);
-    const metadata = await fetchAgent.fetchIPFSMetadata(nft.nft.metadataURI);
-    const response = {
-      nft,
-      metadata,
-    };
-    if (prepareDataJSON) {
-      return prepareJson(response);
-    }
-    return response;
+  let promises: Promise<any>[] = [];
+
+  if (contractAddress == null) {
+    contractAddress = ZORA_MEDIA_CONTRACT_BY_NETWORK[fetchAgent.networkId];
   }
+
+  //todo also validate data in response.
+  const auctionData = await fetchAgent.loadAuctionInfo(contractAddress, tokenId);
+
+  let hasOpensea = (fetchStrategy & NftDataFetchStrategy.Opensea) != 0;
+  let hasZora = (fetchStrategy & NftDataFetchStrategy.ZoraIndexer) != 0;
+  let hasBlockchain = (fetchStrategy & NftDataFetchStrategy.Blockchain) != 0;
+
+  if (hasOpensea) {
+    promises.push(fetchAgent.loadNFTData(contractAddress, tokenId, auctionData).then(nft => {
+      const metadata = openseaDataToMetadata(nft);
+      const response = {
+        nft,
+        metadata,
+      };
+      return response;
+    }))
+  }
+
+  if (hasZora) {
+    promises.push(fetchAgent.loadZoraNFTIndexerNFTUntransformed(contractAddress, tokenId).then(untransformedNft => { 
+      let nft = transformNFTIndexerResponse(untransformedNft, auctionData);
+      const response = {
+        nft,
+        metadata: nft.zoraIndexerResponse.metadata?.json,
+      };
+      return response;
+     }));
+  }
+
+  if (hasBlockchain) {
+    let promise = new Promise((resolve, reject) => {
+      (async () => {
+        try {
+          let nftUntransformed = await fetchAgent.loadBlockchainNFTDataUntransformed(contractAddress!, tokenId);
+          let nft = transformBlockchainResponse(nftUntransformed, auctionData);
+          let metadata = await fetchAgent.fetchIPFSMetadata(nft.nft.metadataURI);
+          const response = {
+            nft,
+            metadata,
+          };
+          resolve(response);
+        } catch (error) {
+          reject(error);
+        }
+      })();
+    });
+    promises.push(promise);
+  }
+
+  const response = await oneSuccess(promises);
+ 
+  if (prepareDataJSON) {
+    return prepareJson(response);
+  }
+  return response;
 };
 
 type fetchZNFTGroupDataType = {

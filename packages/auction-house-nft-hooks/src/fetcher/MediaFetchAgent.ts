@@ -53,6 +53,12 @@ import {
 } from '../graph-queries/zora-indexer';
 import { IndexerTokenWithAuctionFragment } from '../graph-queries/zora-indexer-types';
 import { MetadataIsh } from './MetadataTypes';
+import { Contract, Provider } from 'ethcall';
+
+import * as etherProviders from "@ethersproject/providers";
+import { DEFAULT_INFURA_API_KEY } from '../constants/apiKeys';
+import { ERC721_ABI, ERC721_METADATA_ABI } from '../constants/erc721abi';
+import { BlockchainResponse } from './BlockchainUtils';
 
 /**
  * Internal agent for NFT Hooks to fetch NFT information.
@@ -63,6 +69,7 @@ import { MetadataIsh } from './MetadataTypes';
 export class MediaFetchAgent {
   // Network ID used to set fetch URLs
   readonly networkId: NetworkIDs;
+  readonly infuraApiKey: string;
 
   private timeouts: TimeoutsLookupType;
 
@@ -77,15 +84,18 @@ export class MediaFetchAgent {
     genericNFTLoader: DataLoader<string, OpenseaResponse>;
      // zoraNFTIndexer uses zora indexer
     zoraNFTIndexerLoader: DataLoader<string, IndexerTokenWithAuctionFragment>;
+
+    blockchainNFTLoader: DataLoader<string, BlockchainResponse>;
     // auctionInfoLoader fetches auction info for non-zora NFTs
     auctionInfoLoader: DataLoader<string, ReserveAuctionPartialFragment>;
     // ensLoader
     ensLoader: DataLoader<string, string>;
   };
 
-  constructor(network: NetworkIDs) {
+  constructor(network: NetworkIDs, infuraApiKey = DEFAULT_INFURA_API_KEY) {
     this.timeouts = DEFAULT_NETWORK_TIMEOUTS_MS;
     this.networkId = network;
+    this.infuraApiKey = infuraApiKey;
 
     this.loaders = {
       mediaLoader: new DataLoader((keys) => this.fetchMediaGraph(keys), { cache: false }),
@@ -97,11 +107,15 @@ export class MediaFetchAgent {
         cache: false,
         maxBatchSize: 30,
       }),
+      blockchainNFTLoader: new DataLoader((keys) => this.fetchBlockchainGenericNFT(keys), {
+        cache: false,
+        maxBatchSize: 100,
+      }),
       ensLoader: new DataLoader((keys) => this.loadEnsBatch(keys), { maxBatchSize: 100 }),
       auctionInfoLoader: new DataLoader((keys) => this.fetchAuctionNFTInfo(keys), {
         cache: false,
         maxBatchSize: 300,
-      }),
+      })
     };
   }
 
@@ -302,6 +316,15 @@ export class MediaFetchAgent {
     return nftInfo;
   }
 
+  async loadBlockchainNFTDataUntransformed(contractAddress: string, tokenId: string) {
+    const contractAndToken = `${contractAddress.toLowerCase()}:${tokenId}`;
+    const nftInfo = await this.loaders.blockchainNFTLoader.load(contractAndToken);
+    if (!nftInfo) {
+      throw new RequestError('Cannot fetch NFT information');
+    }
+    return nftInfo;
+  }
+
   async loadZNFTDataUntransformed(mediaId: string) {
     return await this.loaders.mediaLoader.load(mediaId);
   }
@@ -439,13 +462,70 @@ export class MediaFetchAgent {
         urlParams.push(`token_ids=${tokenId}&asset_contract_addresses=${address}`);
       });
     const response = await fetchWithTimeout.fetch(
-      `${apiBase}assets?${urlParams.join('&')}&order_direction=desc&offset=0&limit=50`
+      `${apiBase}assets?${urlParams.join('&')}&order_direction=desc&limit=50`
     );
     const responseJson = await response.json();
 
     return nftAddresses.map((nftAddress) =>
       transformGenericNFTForKey(responseJson.assets, nftAddress)
     );
+  }
+
+  private async fetchBlockchainGenericNFT(nftAddresses: readonly string[]): Promise<BlockchainResponse[]> {
+    //todo support client provider
+    //todo support fallbackProvider
+
+    const ethcallProvider = new Provider();
+    const provider = new etherProviders.InfuraProvider(Number(this.networkId), this.infuraApiKey);
+    await ethcallProvider.init(provider);
+
+    let calls: any[] = [];
+
+    for (let addressWithTokenId of nftAddresses) {
+      let [address, tokenId] = addressWithTokenId.split(':');
+      let erc721Contract = new Contract(address, ERC721_ABI);
+
+      let ownerOfCall = erc721Contract.ownerOf(tokenId);
+      calls.push(ownerOfCall);
+
+      let erc721MetadataContract = new Contract(address, ERC721_METADATA_ABI);
+      let tokenUriCall = erc721MetadataContract.tokenURI(tokenId);
+      calls.push(tokenUriCall);
+
+      //todo optimize, group name and symbol per address.
+      //todo possible remove this, currently this info not used in components
+      let nameCall = erc721MetadataContract.name();
+      calls.push(nameCall);
+
+      let symbolCall = erc721MetadataContract.symbol();
+      calls.push(symbolCall);
+    }
+
+    const data:any = await ethcallProvider.tryAll(calls);
+
+    const REQUESTS_PER_NFT = 4;
+
+    let result = nftAddresses.map((addressWithTokenId, index) => {
+      let [address, tokenId] = addressWithTokenId.split(':');
+
+      let owner = data[REQUESTS_PER_NFT * index + 0]?.toString();
+      let tokenUri = data[REQUESTS_PER_NFT * index + 1]?.toString();
+      let name = data[REQUESTS_PER_NFT * index + 2]?.toString();
+      let symbol = data[REQUESTS_PER_NFT * index + 3]?.toString();
+
+      let response: BlockchainResponse = {
+        address: address,
+        token_id: tokenId,
+        contract_name: name!,
+        contract_symbol: symbol!,
+        owner: owner!,
+        uri: tokenUri!
+      };
+
+      return response;
+    });
+
+    return result;
   }
   
   /**
