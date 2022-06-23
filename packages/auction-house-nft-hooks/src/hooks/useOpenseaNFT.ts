@@ -6,6 +6,7 @@ import useSWR from 'swr';
 import { NFTFetchContext } from '../context/NFTFetchContext';
 import { OpenseaNFTDataType } from '../fetcher/AuctionInfoTypes';
 import { transformOpenseaResponse } from '../fetcher/OpenseaUtils';
+import { onErrorRetry } from '../fetcher/ErrorUtils';
 
 export type useOpenseaNFTType = {
   currencyLoaded: boolean;
@@ -39,12 +40,13 @@ export function useOpenseaNFT(
     contractAddress && tokenId ? ['loadGenericNFT', contractAddress, tokenId] : null,
     (_, contractAddress, tokenId) =>
       fetcher.loadNFTDataUntransformed(contractAddress, tokenId),
-    { dedupingInterval: 0 }
+    { dedupingInterval: 0, onErrorRetry }
   );
+
   const auctionData = useSWR(
     contractAddress && tokenId ? ['loadAuctionForNFT', contractAddress, tokenId] : null,
-    async (_, contractAddress, tokenId) =>
-      fetcher.loadAuctionInfo(contractAddress, tokenId)
+    (_, contractAddress, tokenId) => fetcher.loadAuctionInfo(contractAddress, tokenId),
+    { refreshInterval,  onErrorRetry }
   );
 
   const nftResponseData = nftData.data as any;
@@ -71,7 +73,7 @@ export function useOpenseaNFT(
 
   return {
     currencyLoaded: !!currencyData.data,
-    error: nftData.error,
+    error: nftData.error?.toString(),
     data,
   };
 }

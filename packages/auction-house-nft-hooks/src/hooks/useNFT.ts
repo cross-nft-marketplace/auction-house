@@ -27,7 +27,7 @@ export enum NftDataFetchStrategy {
   Blockchain = 1 << 2,
 
   AllIndexers = ZoraIndexer | Opensea,
-  All = ZoraIndexer | Opensea | Blockchain,
+  All = AllIndexers | Blockchain,
 }
 
 export const DEFAULT_FETCH_STRATEGY = NftDataFetchStrategy.Opensea;

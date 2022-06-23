@@ -1,6 +1,6 @@
 {
   "name": "@cross-nft-marketplace/auction-house-nft-hooks",
-  "version": "1.0.0-alpha.2",
+  "version": "1.0.0-alpha.3",
   "description": "Generic react hooks for fetching cross-nft-marketplace auctions, nfts, and data on arbitary 721s. Powers nft-components.",
   "homepage": "https://github.com/cross-nft-marketplace/auction-house",
   "repository": {

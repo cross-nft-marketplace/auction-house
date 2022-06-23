@@ -1,5 +1,5 @@
 import { useZoraUsername } from "@zoralabs/nft-hooks";
-import type { StyleProps } from "src/utils/StyleTypes";
+import type { StyleProps } from "../utils/StyleTypes";
 import { AddressView } from "../components/AddressView";
 import { useMediaContext } from "../context/useMediaContext";
 
