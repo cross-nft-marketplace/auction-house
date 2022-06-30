@@ -44,6 +44,8 @@ const CENTER_FULL_CONTAINER = `
   justify-items: center;
   display: flex;
   height: 100%;
+  left: 0;
+  top: 0;
 `;
 
 function renderSVG(svg: string) {
@@ -89,6 +91,8 @@ export const Style = {
       height: 100%;
       position: absolute;
       z-index: 1;
+      left: 0;
+      top: 0;
     `,
     cardHeader: (theme: ThemeOptionsType) => css`
       padding: ${theme.textBlockPadding};

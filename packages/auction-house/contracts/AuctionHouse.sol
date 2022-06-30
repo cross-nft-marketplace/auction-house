@@ -1994,7 +1994,7 @@ contract AuctionHouse is IAuctionHouse_v2, ReentrancyGuard, Initializable {
         BidContext_v2 memory context;
 
         (context.buyNowActual, context.amountActual) = _prepareNewBid_v2(auction, auctionId, currency, amount, buyNow);
-        require(context.amountActual <= _addPercentage_v2(amount, slippage), "Insufficient slippage");
+        require(context.amountActual <= _addPercentage_v2(amount, slippage), "Bid too small");
 
         // For Zora Protocol, ensure that the bid is valid for the current bidShare configuration
         /*
@@ -2115,12 +2115,14 @@ contract AuctionHouse is IAuctionHouse_v2, ReentrancyGuard, Initializable {
             reserveAndBuyNowCurrency,
             auction.reservePrice
         );
-        require(newBidPrice >= reservePrice, "Must send at least reservePrice");
-        
-        uint256 oldBidPrice = convertToControlCurrency_v2(
-            auction.currency,
-            auction.amount
-        );
+
+        // user must send at least {reservePrice}
+        if (newBidPrice < reservePrice) {
+            newBidPrice = reservePrice;
+            amount = convertFromControlCurrency_v2(newBidPrice, currency);
+        }
+
+        uint256 oldBidPrice = convertToControlCurrency_v2(auction.currency, auction.amount);
 
         if (oldBidPrice == 0) {
             return (false, amount);

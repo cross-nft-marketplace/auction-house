@@ -37,7 +37,7 @@ export const MediaFull = ({
     if (error) {
       return <div {...getStyles("mediaLoader")}>error fetching...</div>;
     }
-    return <div {...getStyles("mediaLoader")}>loading...</div>;
+    return <div {...getStyles("mediaLoader")}>Loading...</div>;
   };
 
   const media = getContent();

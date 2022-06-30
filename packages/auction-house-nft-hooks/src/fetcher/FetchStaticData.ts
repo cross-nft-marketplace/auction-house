@@ -8,6 +8,8 @@ import { openseaDataToMetadata } from './OpenseaUtils';
 import { addAuctionInformation } from './TransformFetchResults';
 import { transformNFTIndexerResponse } from './ZoraIndexerTransformers';
 import { transformBlockchainResponse } from './BlockchainUtils';
+import { NotFoundError } from './ErrorUtils';
+import { ReserveAuctionPartialFragment } from '../graph-queries/zora-graph-types';
 
 /**
  * This removes undefined values to sanitize
@@ -26,7 +28,8 @@ type fetchNFTDataType = {
   contractAddress?: string;
   fetchAgent: MediaFetchAgent;
   prepareDataJSON?: boolean;
-  fetchStrategy?: NftDataFetchStrategy
+  fetchStrategy?: NftDataFetchStrategy;
+  loadAuctionInfo?: boolean;
 };
 
 //https://stackoverflow.com/a/37235274
@@ -68,6 +71,7 @@ export const fetchNFTData: (args: fetchNFTDataType) => Promise<{
   fetchAgent,
   prepareDataJSON = true,
   fetchStrategy = DEFAULT_FETCH_STRATEGY,
+  loadAuctionInfo = true
 }: fetchNFTDataType) => {
   let promises: Promise<any>[] = [];
 
@@ -76,7 +80,20 @@ export const fetchNFTData: (args: fetchNFTDataType) => Promise<{
   }
 
   //todo also validate data in response.
-  const auctionData = await fetchAgent.loadAuctionInfo(contractAddress, tokenId);
+  let auctionData: ReserveAuctionPartialFragment | undefined;
+
+  if (loadAuctionInfo) {
+    try {
+      auctionData = await fetchAgent.loadAuctionInfo(contractAddress, tokenId);
+    } catch (err) {
+      if (!(err instanceof NotFoundError)) {
+        // Log any not-found error
+        console.error(err);
+      }
+    }
+  }
+
+  //todo stallTimeout, priority as in FallbackProvider.
 
   let hasOpensea = (fetchStrategy & NftDataFetchStrategy.Opensea) != 0;
   let hasZora = (fetchStrategy & NftDataFetchStrategy.ZoraIndexer) != 0;
