@@ -67,8 +67,11 @@ export const AuctionInfo = ({
               <div {...getStyles("fullLabel")}>
                 {getString("BUY_NOW_PRICE")}
               </div>
-              <div {...getStyles("fullInfoAuctionPricing")}>
-                <PricingString pricing={data.pricing.reserve.buyNowPrice} />
+              <div {...getStyles("fullInfoAuctionPricing")}>{
+                data.pricing.reserve.buyNowPrice.amount == "0" ? "N/A" : (
+                  <PricingString pricing={data.pricing.reserve.buyNowPrice} />
+                )
+              }
               </div>
             </div>
           )}

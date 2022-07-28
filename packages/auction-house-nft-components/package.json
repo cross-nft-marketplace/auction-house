@@ -1,6 +1,6 @@
 {
   "name": "@cross-nft-marketplace/auction-house-nft-components",
-  "version": "1.0.0-alpha.5",
+  "version": "1.0.0-alpha.6",
   "description": "NFT Media Rendering Components",
   "typings": "dist/index.d.ts",
   "source": "src/index.ts",
@@ -57,6 +57,7 @@
     "*.{ts,md}": "prettier src --write"
   },
   "scripts": {
+    "serve": "yarn clean && tsc --watch",
     "prepack": "yarn clean && tsc",
     "build": "yarn run prepack",
     "test": "TZ='EST' jest",

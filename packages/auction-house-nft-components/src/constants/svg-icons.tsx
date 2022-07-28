@@ -1,3 +1,5 @@
+import "react";
+
 export const SVG_NEXT_ICON =
   '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"><title>arrow-top-right</title><g stroke-linecap="square" stroke-linejoin="miter" stroke-width="2" fill="currentColor" stroke="currentColor"><line fill="none" stroke-miterlimit="10" x1="2" y1="22" x2="22" y2="2" stroke-linecap="butt"></line> <polyline fill="none" stroke="currentColor" stroke-miterlimit="10" points="12,2 22,2 22,12 "></polyline></g></svg>';
 
@@ -21,3 +23,15 @@ export const SVG_AUCTION_APPROVE =
 
 export const SVG_AUCTION_DENY =
   '<svg width="17" height="17" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg"> <path d="M2 2L8.75 8.75M15.5 15.5L8.75 8.75M8.75 8.75L15.5 2L2 15.5" stroke="black" stroke-width="3"/> </svg>';
+
+export const SVG_MEDIA_LOADER_ERROR = () =>
+    <>
+        <svg width="180" height="186" viewBox="0 0 180 186" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M90.5 2.13397L90 1.8453L89.5 2.13397L11.5577 47.134L11.0577 47.4226V48V138V138.577L11.5577 138.866L89.5 183.866L90 184.155L90.5 183.866L168.442 138.866L168.942 138.577V138V48V47.4226L168.442 47.134L90.5 2.13397Z"
+                  stroke="#E6E6E6" strokeWidth="2"/>
+            <circle cx="53" cy="61" r="13" stroke="#E6E6E6" strokeWidth="2"/>
+            <path d="M53.1048 87.5473L31.1072 120.793C29.3477 123.452 31.2545 127 34.443 127H145.435C148.648 127 150.55 123.403 148.741 120.748L110.137 64.0804C108.509 61.6898 104.959 61.7648 103.433 64.2222L73.9412 111.713L59.892 87.7326C58.3954 85.178 54.7386 85.0782 53.1048 87.5473Z"
+                  stroke="#E6E6E6" strokeWidth="2"/>
+        </svg>
+
+    </>

@@ -84,7 +84,7 @@ export const Style = {
         : ""}
     `,
     cardLink: (_: ThemeOptionsType) => css`
-      ${buttonReset}
+      ${buttonReset};
       color: transparent;
       background: transparent;
       width: 100%;
@@ -127,7 +127,7 @@ export const Style = {
             `;
           case "reserve-pending":
             return `
-              background: #e6e6e6; 
+              background: #ffffff; 
             `;
           case "unknown":
           case "perpetual":
@@ -136,7 +136,7 @@ export const Style = {
       };
       return css`
         display: grid;
-        grid-auto-flow: column;
+        grid-auto-flow: row;
         grid-template-rows: auto auto;
         grid-auto-columns: 1fr;
         padding: ${theme.textBlockPadding};
@@ -544,6 +544,9 @@ export const Style = {
     `,
     mediaObjectMessage: (_: ThemeOptionsType) => css`
       align-self: center;
+      margin-top: 16px;
+      letter-spacing: 0.14em;
+      color: #858585;
     `,
     mediaContentText: (theme: ThemeOptionsType) => [
       css`
@@ -588,6 +591,31 @@ export const Style = {
       background-image: url("data:image/svg+xml,${encodeURIComponent(
         muted ? SVG_UNMUTED : SVG_MUTED
       )}");
+    `,
+    auctionsBuyNowPrice: () => css`
+      display: flex;
+      flex-direction: column;
+    )}");
+    `,
+    auctionsBuyNowPriceAmount: (theme: ThemeOptionsType) => [
+      css`
+        align-self: flex-end;
+      `,
+      theme.bodyFont,
+    ],
+    auctionsHighestBidPrice: () => css`
+      display: flex;
+      justify-content: space-between;
+    )}");
+    `,
+    mediaLoaderError: () => css`
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      height: 100%;
+      justify-content: center;
+    )}");
     `,
   },
 };

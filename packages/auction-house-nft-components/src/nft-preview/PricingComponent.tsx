@@ -5,12 +5,15 @@ import { NFTDataContext } from "../context/NFTDataContext";
 import { CountdownDisplay } from "../components/CountdownDisplay";
 import { PricingString } from "../utils/PricingString";
 import { AuctionStateInfo, AuctionType } from "@cross-nft-marketplace/auction-house-nft-hooks";
+import { dateFromTimestamp, dateFormat } from "../utils/date";
 import type { StyleProps } from "../utils/StyleTypes";
 
 function isInFuture(timestamp: string) {
   const timestampParsed = parseInt(timestamp);
   return timestampParsed > Math.floor(new Date().getTime() / 1000);
 }
+
+const dateWithComma = (date: string) => dateFormat(date).replace(' at', ',')
 
 type PricingComponentProps = {
   showPerpetual?: boolean;
@@ -100,24 +103,45 @@ export const PricingComponent = ({
       </div>
     );
   }
+
   if (pricing && pricing.reserve) {
     if (
       pricing.reserve?.current.reserveMet &&
       !pricing.reserve?.current.likelyHasEnded
     ) {
       const highestBid = pricing.reserve?.current.highestBid;
+      const buyNow = pricing.reserve?.buyNowPrice &&
+          pricing.reserve?.buyNowPrice?.amount !== "0" &&
+          (<div {...getStyles("auctionsBuyNowPrice")}>
+              <span {...getStyles("textSubdued")}>{getString("BUY_NOW_PRICE")}</span>
+              <span {...getStyles("auctionsBuyNowPriceAmount")}>
+                      {highestBid && (
+                          <PricingString
+                              showUSD={false}
+                              pricing={pricing.reserve.buyNowPrice}
+                          />
+                      )}
+                    </span>
+          </div>)
+
+
       return (
         <div
           {...getStyles("cardAuctionPricing", className, {
             type: "reserve-active",
           })}
         >
-          <span {...getStyles("textSubdued")}>{getString("TOP_BID")}</span>
-          <span {...getStyles("pricingAmount")}>
-            {highestBid && (
-              <PricingString pricing={highestBid?.pricing} showUSD={false} />
-            )}
-          </span>
+          <div {...getStyles("auctionsHighestBidPrice")}>
+            <div>
+              <span {...getStyles("textSubdued")}>{getString("TOP_BID")}</span>
+              <span {...getStyles("pricingAmount")}>
+                {highestBid && (
+                    <PricingString pricing={highestBid?.pricing} showUSD={false} />
+                )}
+            </span>
+            </div>
+            { buyNow }
+          </div>
           {pricing.reserve?.expectedEndTimestamp &&
             isInFuture(pricing.reserve.expectedEndTimestamp) && (
               <Fragment>
@@ -148,6 +172,16 @@ export const PricingComponent = ({
           <span {...getStyles("pricingAmount")}>
             <PricingString showUSD={false} pricing={highestBid.pricing} />
           </span>
+          <span {...getStyles("textSubdued")}>
+              {getString("SOLD_AT")}
+            </span>
+          <span>
+            <time
+                dateTime={dateFromTimestamp(pricing.reserve.approvedTimestamp).toISOString()}
+            >
+                {dateWithComma(pricing.reserve.approvedTimestamp)}
+              </time>
+          </span>
         </div>
       );
     }
@@ -168,6 +202,20 @@ export const PricingComponent = ({
               />
             </span>
           </div>
+        );
+      }
+
+      if (pricing.reserve?.buyNowPrice
+          && pricing.reserve?.buyNowPrice?.amount === "0") {
+        buyNowPrice = (
+            <div>
+              <span {...getStyles("textSubdued")}>
+                {getString("BUY_NOW_PRICE")}
+              </span>
+                <span>
+                  {getString("NOT_APPLICABLE")}
+              </span>
+            </div>
         );
       }
 

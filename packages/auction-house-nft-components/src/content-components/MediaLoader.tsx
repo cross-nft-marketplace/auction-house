@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import type { RenderRequest } from "./RendererConfig";
+import { SVG_MEDIA_LOADER_ERROR } from "../constants/svg-icons";
 
 function getNormalizedURI(
   uri: string,
@@ -72,8 +73,10 @@ export const MediaLoader = ({
   if (error) {
     return (
       <React.Fragment>
-        <span {...getStyles("mediaObjectMessage")}>Error loading content</span>
-        {children}
+        <div {...getStyles("mediaLoaderError")}>
+          {SVG_MEDIA_LOADER_ERROR()}
+          <span {...getStyles("mediaObjectMessage")}>Media not loading</span>
+        </div>
       </React.Fragment>
     );
   }

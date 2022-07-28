@@ -6,20 +6,9 @@ import { NFTDataContext } from "../context/NFTDataContext";
 import { useMediaContext } from "../context/useMediaContext";
 import { InfoContainer } from "./InfoContainer";
 import type { StyleProps } from "../utils/StyleTypes";
+import { dateFromTimestamp, dateFormat } from "../utils/date";
 import { VIEW_ETHERSCAN_URL_BASE_BY_NETWORK } from "../constants/media-urls";
 import type { PastReserveBid } from "@cross-nft-marketplace/auction-house-nft-hooks/dist/fetcher/AuctionInfoTypes";
-
-const dateFromTimestamp = (timestamp: string) =>
-  new Date(parseInt(timestamp, 10) * 1000);
-
-const formatDate = (timestamp: string) =>
-  dateFromTimestamp(timestamp).toLocaleString("en-US", {
-    month: "long",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: true,
-  });
 
 type BidHistoryProps = {
   showPerpetual?: boolean;
@@ -113,6 +102,23 @@ export const BidHistory = ({
       });
     }
 
+    if ("zoraIndexerResponse" in data && data.zoraIndexerResponse.minter) {
+      const unixDate =
+        new Date(
+          data.zoraIndexerResponse.mintTransferEvent?.blockTimestamp + "Z"
+        ).getTime() / 1000;
+
+      eventsList.push({
+        key: `${data.zoraIndexerResponse.minter}-${unixDate}-minted`,
+        activityDescription: getString("BID_HISTORY_MINTED"),
+        pricing: <Fragment />,
+        actor: data.zoraIndexerResponse.minter,
+        createdAt: unixDate.toString(),
+        transactionHash:
+          data.zoraIndexerResponse.mintTransferEvent?.transactionHash || null,
+      });
+    }
+
     if ("openseaInfo" in data && data.openseaInfo.creator) {
       eventsList.push({
         activityDescription: getString("BID_HISTORY_MINTED"),
@@ -156,7 +162,7 @@ export const BidHistory = ({
                 dateTime={dateFromTimestamp(bidItem.createdAt).toISOString()}
                 {...getStyles("fullPageHistoryItemDatestamp")}
               >
-                {formatDate(bidItem.createdAt)}
+                {dateFormat(bidItem.createdAt)}
               </time>
             </div>
           )}

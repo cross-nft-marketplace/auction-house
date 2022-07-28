@@ -70,6 +70,14 @@ export const Strings = {
    */
   SOLD_FOR: "Sold for",
   /**
+   * Sold at used in pricing components
+   */
+  SOLD_AT: "Nft sold at",
+  /**
+   * Not applicable used in pricing components
+   */
+  NOT_APPLICABLE: "N/A",
+  /**
    * Created by text in preview card
    */
   CARD_CREATED_BY: "Created by",
